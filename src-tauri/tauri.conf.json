@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "TerminalMate",
+  "version": "0.1.0",
+  "identifier": "nz.co.allaneramo.terminal-mate",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1430",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "TerminalMate",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 900,
+        "minHeight": 620,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost; style-src 'self' 'unsafe-inline'; img-src 'self' data: asset:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Allan P. Erasmo",
+    "shortDescription": "Safety-first terminal workspace UI preview",
+    "longDescription": "TerminalMate Phase 1 UI preview for reviewing the organized workspace, environment context, and safety-first command experience.",
+    "externalBin": ["binaries/terminal-mate-sidecar"]
+  }
+}
