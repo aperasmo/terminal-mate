@@ -1,15 +1,26 @@
 node_modules/
 dist/
 tsbuildinfo/
+*.tsbuildinfo
+npm-debug.log*
 
 .build/
 .local/
+.tmp-cwd.txt
+test.txt
+.env
+.env.*
+!.env.example
+!.env.*.example
 .venv/
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+sidecar/build/
+sidecar/dist/
+sidecar/*.spec
 
 src-tauri/target/
 src-tauri/binaries/*
@@ -17,4 +28,10 @@ src-tauri/binaries/*
 
 .DS_Store
 Thumbs.db
-
+*.cwd
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.log

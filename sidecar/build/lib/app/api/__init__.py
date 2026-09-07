@@ -1,2 +1,0 @@
-"""TerminalMate API routes."""
-

@@ -1,2 +1,0 @@
-"""TerminalMate local sidecar."""
-
