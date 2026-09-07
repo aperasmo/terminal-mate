@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ExecutionProfile {
     pub host_os: String,
@@ -13,7 +13,7 @@ pub struct ExecutionProfile {
     pub privilege: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Workspace {
     pub id: String,
@@ -21,4 +21,3 @@ pub struct Workspace {
     pub path: String,
     pub profile: ExecutionProfile,
 }
-

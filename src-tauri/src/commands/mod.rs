@@ -1,4 +1,9 @@
+pub mod command_runs;
+pub mod external_terminal;
+pub mod file_editor;
+pub mod intent_adapter;
+pub mod intents;
 pub mod policy;
 pub mod sessions;
+pub mod settings;
 pub mod workspaces;
-

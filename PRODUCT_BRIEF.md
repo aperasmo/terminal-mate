@@ -1,6 +1,7 @@
 # TerminalMate Product Brief
 
-Status: Phase 0 - Product definition  
+Status: Phase 0 - Product definition (foundational scope; implementation has
+since progressed into Phase 2 - see [Roadmap](ROADMAP.md))
 Date: 25/07/2026
 
 ## Product Summary
@@ -122,6 +123,21 @@ The application uses four stable areas:
   running activity, and recovery guidance.
 - **Bottom input:** plain-English requests and direct command entry.
 
+The implemented workspace experience also keeps the latest 10 runs per
+workspace across restarts, restores a selected run's original request for
+reuse, and limits the visible transcript to the latest 1,000 lines for
+responsive switching. Complete command output remains available through
+**Open log** and **Copy log**. Guided local file workflows cover creation,
+single-file deletion, and guarded copy or move into the active workspace;
+script workflows cover one script or approved sequential batches in the
+selected PowerShell or WSL runtime.
+
+Formatted PowerShell inspection work can remain one reviewed operation:
+assignments plus `foreach` or range-based `ForEach-Object` pipelines retain
+their shared scope. Recursive searches can recover from inaccessible folders
+without discarding readable matches, and common port-ownership questions map
+to deterministic commands for the selected runtime.
+
 Example:
 
 1. The user selects the `terminal-mate` workspace.
@@ -180,7 +196,7 @@ The first release will not include:
 Phase 1 is successful when a user can:
 
 - keep multiple project sessions organized in one window;
-- use plain English to navigate and inspect a WSL workspace;
+- use plain English to navigate and inspect a registered workspace;
 - see the exact environment and command before meaningful changes;
 - distinguish safe inspection from mutating and destructive operations;
 - recover from common path, tool, permission, and command failures;

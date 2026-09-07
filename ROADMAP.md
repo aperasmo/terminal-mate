@@ -1,6 +1,8 @@
 # TerminalMate Roadmap
 
-Status: Phase 0 - Approved direction  
+Status: Phase 2 in progress - WSL / Linux Subsystem Support and infrastructure
+intents (see [Project status](TERMINAL-MATE-PROJECT_STATUS.md) for the current
+slice)
 Started: 25/07/2026
 
 Version numbers align with product phases.
@@ -45,10 +47,18 @@ Planned capabilities:
 - Safe, Caution, High Risk, and Blocked policy decisions;
 - navigation, listing/finding files by name or extension, viewing a line
   range of a file, text search, process inspection, and port inspection;
-- command preview, execution, streaming output, Stop, and local history;
+- command preview, execution, streaming output, live elapsed time, Stop, and
+  durable workspace-specific history with final command duration;
 - AI-provider settings and privacy receipts;
 - initial diagnostics and recovery guidance;
 - Windows installer for the native Windows experience.
+
+Scope boundary:
+
+- common local developer commands are included in Phase 1;
+- Git-specific guided workflows are deferred to avoid duplicating AI Git
+  Assistant before TerminalMate's terminal and DevOps strengths are mature;
+- SSH and remote execution remain Phase 4.
 
 Exit criteria:
 
@@ -75,6 +85,62 @@ Planned capabilities:
   path-conversion helper);
 - cross-platform adapter golden tests;
 - environment-specific recovery guidance.
+
+Completed on 01/08/2026:
+
+- persisted Windows PowerShell / WSL Bash selection per workspace;
+- real WSL Bash sessions and foreground command execution;
+- Windows-to-WSL workspace path mapping;
+- Bash rendering for the existing deterministic intent catalogue;
+- shared safety classification across PowerShell and Bash.
+
+Completed prioritized slice on 01/08/2026 (`v0.2.1`):
+
+- deterministic Azure CLI and Terraform intents from the approved intent
+  specification;
+- typed command parameters and prerequisite checks instead of free-form shell
+  generation;
+- Safe, Caution, High Risk, Blocked, and Explain Only decisions appropriate to
+  infrastructure operations;
+- explain-only handling for Azure storage-key retrieval and resource-group
+  deletion;
+- typed-`RUN` High Risk execution for Terraform apply/destroy, rendered with
+  `-auto-approve` because TerminalMate has no interactive stdin channel.
+
+Completed Phase 2 usability slices through 26/08/2026:
+
+- persistent per-workspace Windows/WSL runtime selection and path mapping;
+- latest-10 reusable run history with elapsed time and restart persistence;
+- responsive 1,000-line transcripts backed by complete on-disk logs, including
+  one-click complete-log copying;
+- script execution with arguments, sequential batch ordering, recursive
+  discovery, live unbuffered Python output, and stop-on-failure behavior;
+- exact multiline commands, cohesive PowerShell `foreach` and
+  `ForEach-Object` blocks, and sequential pasted command queues with
+  independent safety decisions;
+- workspace-relative navigation and guarded file create, delete, copy, and cut
+  workflows;
+- deterministic recovery guidance, including guided Azure subscription
+  diagnosis and retry;
+- permission-tolerant recursive PowerShell searches and expanded process/port
+  ownership requests;
+- byte-safe piped Windows output with long-line regression coverage.
+
+Completed on 31/08/2026:
+
+- optional local-first generative AI intent fallback with a strict action
+  allowlist and typed parameter validation;
+- trusted Rust rendering and unchanged safety/approval enforcement for AI
+  plans, with visible source provenance;
+- session-only OpenAI-compatible provider configuration and a visible top-bar
+  planner status control;
+- persistent per-workspace, per-runtime directory Back/Forward history.
+
+Remaining Phase 2 work:
+
+- expanded PowerShell/Bash golden test matrix;
+- environment-specific recovery guidance;
+- broader WSL capability detection beyond the initial availability check.
 
 ## Phase 3 - Developer and DevOps Toolkit - v0.3.0
 

@@ -1,7 +1,7 @@
 {
   "name": "terminal-mate",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite --configLoader runner",
@@ -13,6 +13,9 @@
     "sidecar:build": "node ./scripts/build-sidecar.mjs",
     "sidecar:test": "node ./scripts/test-sidecar.mjs",
     "sidecar:test:install": "node ./scripts/test-sidecar.mjs --install-dependencies",
+    "command-parser:test": "node ./scripts/test-sequential-commands.mjs",
+    "terminal-transcript:test": "node ./scripts/test-terminal-transcript.mjs",
+    "terminal-timestamp:test": "node ./scripts/test-terminal-timestamp.mjs",
     "installer": "node ./scripts/build-installer.mjs",
     "installer:windows": "node ./scripts/build-installer.mjs --target windows",
     "format:check": "prettier --check .",

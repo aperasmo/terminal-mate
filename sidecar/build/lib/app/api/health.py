@@ -14,5 +14,4 @@ router = APIRouter(prefix="/v1", tags=["system"])
     dependencies=[Depends(require_session_token)],
 )
 def health() -> HealthResponse:
-    return HealthResponse(status="ok", protocol_version="1", service_version="0.1.0")
-
+    return HealthResponse(status="ok", protocol_version="1", service_version="0.2.1")

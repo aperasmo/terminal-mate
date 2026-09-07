@@ -1,15 +1,27 @@
-import { CircleHelp, Settings, ShieldCheck, SquareTerminal } from "lucide-react";
+import {
+  Bot,
+  CircleHelp,
+  Settings,
+  ShieldCheck,
+  SquareTerminal,
+} from "lucide-react";
 
 interface TopBarProps {
   version: string;
   activeWorkspaceName?: string;
   environmentLabel?: string;
+  onHelp: () => void;
+  onSettings: () => void;
+  aiPlannerEnabled: boolean;
 }
 
 export function TopBar({
   version,
   activeWorkspaceName,
-  environmentLabel
+  environmentLabel,
+  onHelp,
+  onSettings,
+  aiPlannerEnabled,
 }: TopBarProps) {
   return (
     <header className="topbar">
@@ -42,7 +54,23 @@ export function TopBar({
           <ShieldCheck size={16} />
           Safety ready
         </span>
-        <button className="icon-button" type="button" aria-label="Help" title="Help">
+        <button
+          className={`ai-planner-status${aiPlannerEnabled ? " is-enabled" : ""}`}
+          type="button"
+          aria-label={`Generative AI planner is ${aiPlannerEnabled ? "on" : "off"}. Open settings.`}
+          title="Open generative AI planner settings"
+          onClick={onSettings}
+        >
+          <Bot size={16} />
+          AI planner: {aiPlannerEnabled ? "On" : "Off"}
+        </button>
+        <button
+          className="icon-button"
+          type="button"
+          aria-label="Help"
+          title="Help"
+          onClick={onHelp}
+        >
           <CircleHelp size={19} />
         </button>
         <button
@@ -50,6 +78,7 @@ export function TopBar({
           type="button"
           aria-label="Settings"
           title="Settings"
+          onClick={onSettings}
         >
           <Settings size={19} />
         </button>

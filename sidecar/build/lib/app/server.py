@@ -6,6 +6,7 @@ import uvicorn
 
 from app.config import Settings
 from app.main import create_app
+from app.process_guard import start_parent_process_guard
 
 
 class ReadyServer(uvicorn.Server):
@@ -24,6 +25,7 @@ class ReadyServer(uvicorn.Server):
 
 
 def run_sidecar() -> None:
+    start_parent_process_guard()
     settings = Settings.from_env()
     app = create_app(settings)
     config = uvicorn.Config(
@@ -35,4 +37,3 @@ def run_sidecar() -> None:
         lifespan="on",
     )
     ReadyServer(config).run()
-

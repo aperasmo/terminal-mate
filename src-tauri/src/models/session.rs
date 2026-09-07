@@ -19,6 +19,9 @@ pub struct SessionSummary {
 #[serde(rename_all = "camelCase")]
 pub struct SessionOutputEvent {
     pub session_id: String,
+    pub run_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub command: Option<String>,
     pub stream: OutputStream,
     pub chunk: String,
 }
