@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import type { Workspace } from "../lib/types";
+import { WorkspaceBrowser } from "./WorkspaceBrowser";
 
 interface WorkspaceSidebarProps {
   workspaces: Workspace[];
@@ -22,10 +23,14 @@ interface WorkspaceSidebarProps {
    * looking at — same idea as the tab warning badge in terminal apps like
    * Warp. */
   warnings?: Record<string, boolean>;
+  activeWorkspace?: Workspace;
+  currentDirectory?: string;
+  browserNavigationEnabled: boolean;
   onAdd: () => void;
   onSelect: (workspaceId: string) => void;
   onRemove: (workspaceId: string) => void;
   onRename: (workspaceId: string, alias: string) => string | null;
+  onNavigateDirectory: (directory: string) => Promise<string>;
 }
 
 export function WorkspaceSidebar({
@@ -33,10 +38,14 @@ export function WorkspaceSidebar({
   activeWorkspaceId,
   busy,
   warnings,
+  activeWorkspace,
+  currentDirectory,
+  browserNavigationEnabled,
   onAdd,
   onSelect,
   onRemove,
   onRename,
+  onNavigateDirectory,
 }: WorkspaceSidebarProps) {
   const [query, setQuery] = useState("");
   const [editingWorkspaceId, setEditingWorkspaceId] = useState<string | null>(
@@ -250,6 +259,13 @@ export function WorkspaceSidebar({
           </div>
         ) : null}
       </div>
+
+      <WorkspaceBrowser
+        workspace={activeWorkspace}
+        currentDirectory={currentDirectory}
+        navigationEnabled={browserNavigationEnabled}
+        onNavigate={onNavigateDirectory}
+      />
 
       <div className="sidebar-footer">
         <span className="status-dot" />

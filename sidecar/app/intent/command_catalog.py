@@ -658,6 +658,35 @@ COMMAND_CATALOG: list[dict[str, object]] = [
     "required_parameters": []
   },
   {
+    "id": "aws_show_current_cost_forecast",
+    "provider": "aws",
+    "title": "Show current AWS cost forecast",
+    "risk": "AWSSafe",
+    "command": "aws ce get-cost-forecast --time-period Start=<YYYY-MM-DD>,End=<NEXT-MONTH-01> --metric UNBLENDED_COST --granularity MONTHLY --output table",
+    "aliases": [
+      "Show current AWS cost forecast",
+      "Show current cost forecast",
+      "AWS cost forecast",
+      "Current AWS cost forecast",
+      "Current cost forecast"
+    ],
+    "required_parameters": []
+  },
+  {
+    "id": "aws_list_ec2_instances",
+    "provider": "aws",
+    "title": "List AWS EC2 instances",
+    "risk": "AWSSafe",
+    "command": "aws ec2 describe-instances --query \"Reservations[].Instances[].{Id:InstanceId,Name:Tags[?Key=='Name']|[0].Value,State:State.Name,Type:InstanceType,PrivateIp:PrivateIpAddress,PublicIp:PublicIpAddress}\" --output table",
+    "aliases": [
+      "List AWS EC2 instances",
+      "List EC2 instances",
+      "Show AWS EC2 instances",
+      "Show EC2 instances"
+    ],
+    "required_parameters": []
+  },
+  {
     "id": "aws_show_aws_configured_region",
     "provider": "aws",
     "title": "Show AWS configured region",

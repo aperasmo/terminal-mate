@@ -136,6 +136,16 @@ Completed on 31/08/2026:
   planner status control;
 - persistent per-workspace, per-runtime directory Back/Forward history.
 
+Completed on 13/09/2026:
+
+- a rooted sidebar Workspace Explorer for visually browsing immediate folders
+  and files and changing the live session directory without typing `cd`;
+- canonical path containment, Windows/WSL mapping, root-aware Up navigation,
+  refresh, and integration with the existing Back/Forward history;
+- expanded deterministic AWS identity, cost forecast, and EC2 phrasing;
+- a guard that prevents unresolved plain-English requests from executing as
+  literal shell commands.
+
 Remaining Phase 2 work:
 
 - expanded PowerShell/Bash golden test matrix;

@@ -2,6 +2,7 @@ import {
   CircleHelp,
   ClipboardCopy,
   CornerDownLeft,
+  FolderTree,
   History,
   Pencil,
   Search,
@@ -796,6 +797,16 @@ export function HelpModal({
           ) : null}
 
           <div className="help-workflow-note" aria-label="Runs and output help">
+            <div>
+              <FolderTree size={17} aria-hidden="true" />
+              <span>
+                <strong>Workspace Explorer</strong>
+                Select a workspace to browse its folders and files in the left
+                sidebar. Select a folder to move the live terminal there without
+                typing a cd command. Up stops at the workspace root, and
+                command-line Back and Forward keep the same folder history.
+              </span>
+            </div>
             <div>
               <Search size={17} aria-hidden="true" />
               <span>

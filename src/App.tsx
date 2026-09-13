@@ -645,12 +645,24 @@ function App() {
         <WorkspaceSidebar
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspaceId}
+          activeWorkspace={activeWorkspace}
+          currentDirectory={
+            activeSession
+              ? currentDirectoryBySession[activeSession.id]
+              : activeWorkspace?.profile.workingDirectory
+          }
+          browserNavigationEnabled={Boolean(
+            activeSession && !activeRunBySession[activeSession.id],
+          )}
           busy={pickingWorkspace}
           warnings={workspaceWarnings}
           onAdd={() => void addWorkspace()}
           onSelect={setActiveWorkspaceId}
           onRemove={removeWorkspace}
           onRename={renameWorkspace}
+          onNavigateDirectory={(directory) =>
+            navigateSessionDirectory(directory)
+          }
         />
 
         <div className="primary-column">

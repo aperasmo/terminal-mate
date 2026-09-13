@@ -45,6 +45,13 @@ pub async fn resolve_command(
         });
     }
 
+    if looks_like_plain_english_request(trimmed) {
+        return Err(
+            "TerminalMate could not translate this plain-English request. Rephrase it using an example from Help, enable the AI planner in Settings, or enter an exact shell command."
+                .to_owned(),
+        );
+    }
+
     let (prepared, adjusted) = prepare_direct_command(trimmed, &profile);
 
     Ok(ResolvedCommand {
@@ -76,6 +83,45 @@ fn prepare_direct_command(command: &str, profile: &ExecutionProfile) -> (String,
 
 fn is_powershell(shell: &str) -> bool {
     shell.eq_ignore_ascii_case("powershell") || shell.eq_ignore_ascii_case("pwsh")
+}
+
+fn looks_like_plain_english_request(message: &str) -> bool {
+    let normalized = message.trim().to_ascii_lowercase();
+    if normalized.is_empty() || normalized.contains('\n') {
+        return false;
+    }
+
+    if [
+        "can you ",
+        "could you ",
+        "would you ",
+        "will you ",
+        "please ",
+        "show me ",
+        "take me ",
+    ]
+    .iter()
+    .any(|prefix| normalized.starts_with(prefix))
+    {
+        return true;
+    }
+
+    let words = normalized.split_whitespace().collect::<Vec<_>>();
+    if words.len() < 3 {
+        return false;
+    }
+
+    let first = words[0].trim_matches(|character: char| !character.is_alphanumeric());
+    [
+        "check", "create", "delete", "display", "find", "inspect", "list", "open",
+        "read", "remove", "restart", "run", "show", "start", "stop",
+    ]
+    .contains(&first)
+        || (first == "my"
+            && matches!(
+                words.get(1).copied(),
+                Some("aws" | "azure" | "gcp" | "google")
+            ))
 }
 
 fn repair_powershell_pipeline_variable(command: &str) -> String {
@@ -625,6 +671,28 @@ $*.Name -like "*source_boundary_contract*"
         let (mode, explanation) = execution_guidance("azure_resource_group_delete");
         assert_eq!(mode, ResolvedCommandExecutionMode::ExplainOnly);
         assert!(explanation.is_some());
+    }
+
+    #[test]
+    fn identifies_conversational_requests_without_blocking_exact_commands() {
+        for request in [
+            "can you check current cost forecast",
+            "check current cost forecast",
+            "List AWS EC2 instances.",
+            "my AWS identity please",
+        ] {
+            assert!(looks_like_plain_english_request(request), "{request}");
+        }
+
+        for command in [
+            "aws ec2 describe-instances",
+            "Get-ChildItem -Force",
+            "docker compose up",
+            "uv run python -m scripts.ingest",
+            "start notepad",
+        ] {
+            assert!(!looks_like_plain_english_request(command), "{command}");
+        }
     }
 
     #[test]

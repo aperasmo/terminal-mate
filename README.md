@@ -18,6 +18,8 @@ The initial scaffold includes:
 - React and TypeScript workspace interface;
 - native folder selection and execution-profile detection;
 - locally persisted workspace registration with editable aliases;
+- a rooted Workspace Explorer that lists folders and files in the selected
+  workspace and changes the live terminal directory with a folder click;
 - multiple independent workspace entries for the same folder, useful when one
   path needs different names, runtimes, terminal sessions, or run histories;
 - Python 3.12 FastAPI sidecar;
@@ -49,9 +51,10 @@ The initial scaffold includes:
   command queues;
 - searchable in-app Help covering everyday, Azure, Terraform, and SSH requests,
   with safety labels and one-click reuse in the active command line;
-- command-line Help shortcuts: `Help`, `Help Azure`, `Help Terraform`, and
-  `Help SSH` open the matching reference directly; unsupported topics such as
-  `Help AWS` are identified clearly instead of being sent for execution;
+- command-line Help shortcuts: `Help`, `Help Azure`, `Help AWS`,
+  `Help Terraform`, and `Help SSH` open the matching reference directly;
+  genuinely unsupported topics are identified clearly instead of being sent
+  for execution;
 - an Explain Only boundary for sensitive infrastructure operations, showing
   the exact command and rationale without offering an execution button;
 - proportional command policy classification and explicit approval for
@@ -109,6 +112,13 @@ Use the **Windows** / **WSL** selector in Environment Context to change the
 active workspace runtime. The choice belongs to that workspace, persists after
 restart, and starts a matching PowerShell or Bash session. TerminalMate checks
 that WSL is available before accepting WSL mode.
+
+Select a workspace to open its **Explorer** beneath the workspace list. The
+Explorer shows the current relative path, places folders before files, and lets
+you enter a folder without typing `cd` or adding a navigation command to the
+terminal transcript. **Up** cannot leave the registered workspace root, and
+**Refresh** reloads the current folder. Navigation is temporarily disabled
+while a command is running so the active process keeps a stable directory.
 
 The command line's Back and Forward buttons follow folder-history behavior,
 not parent/child guessing. History is retained separately for each workspace

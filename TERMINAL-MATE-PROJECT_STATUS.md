@@ -1,6 +1,6 @@
 # TerminalMate Project Status
 
-Last updated: 31/08/2026
+Last updated: 13/09/2026
 
 ## Current Release
 
@@ -34,6 +34,33 @@ Last updated: 31/08/2026
   The deterministic `ssh_vm` intent also renders with `BatchMode=yes` and
   `StrictHostKeyChecking=accept-new`, so it fails fast instead of hanging on
   a first-connection host-key or password prompt.
+
+## Phase 2 slice - Interactive workspace browsing and safer request routing - 13/09/2026
+
+Completed:
+
+1. Added a compact Explorer beneath the workspace list with directories first,
+   files for orientation, the current relative path, item counts, Up, and
+   Refresh controls.
+2. Connected folder selection to the existing persistent PowerShell or WSL
+   session, so the live working directory changes without typing `cd` or
+   adding navigation noise to the command transcript.
+3. Canonicalized every requested directory in Rust and rejected navigation
+   outside the registered workspace root.
+4. Reused the Windows/WSL path adapters so one browser works with both runtime
+   choices and feeds the existing per-runtime Back/Forward history.
+5. Disabled browser navigation while a foreground command is running and
+   disabled Up at the workspace root.
+6. Expanded deterministic AWS matching for identity, current cost forecast,
+   and EC2 requests, including polite conversational prefixes.
+7. Prevented unmatched plain-English requests from falling through as literal
+   shell commands when neither the local matcher nor AI planner resolves them.
+
+Validation:
+
+- Frontend TypeScript and production Vite build passed.
+- Python sidecar tests passed: 163 tests.
+- Rust library tests passed: 203 tests, including 11 focused workspace tests.
 
 ## Phase 2 fix - Stateful PowerShell paste and semantic Git outcomes - 28/08/2026
 

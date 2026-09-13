@@ -18,6 +18,20 @@ export interface Workspace {
   profile: ExecutionProfile;
 }
 
+export interface WorkspaceDirectoryEntry {
+  name: string;
+  path: string;
+  kind: "directory" | "file";
+  hidden: boolean;
+}
+
+export interface WorkspaceDirectoryListing {
+  currentDirectory: string;
+  relativePath: string;
+  parentDirectory: string | null;
+  entries: WorkspaceDirectoryEntry[];
+}
+
 export type OutputStream = "stdout" | "stderr";
 
 export interface SessionSummary {

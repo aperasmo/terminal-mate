@@ -34,6 +34,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::workspaces::pick_workspace,
             commands::workspaces::configure_workspace_runtime,
+            commands::workspaces::list_workspace_directory,
             commands::sessions::create_session,
             commands::sessions::close_session,
             commands::sessions::send_session_input,

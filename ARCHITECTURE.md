@@ -405,6 +405,16 @@ its WSL equivalent on demand by a pure path-conversion helper
 execution profile's working directory. Remote (SSH) path handling remains a
 later-phase design, not yet implemented.
 
+The sidebar Workspace Explorer calls the typed Rust
+`list_workspace_directory` command for one directory level at a time. Rust
+maps the selected runtime path back to the host filesystem, canonicalizes both
+the requested directory and registered workspace root, and refuses any path
+outside that root before reading entries. It then maps entry paths back to the
+workspace runtime representation. Folder clicks use the same
+`set_session_working_directory` boundary as command-line navigation, so the
+persistent shell and per-runtime Back/Forward history remain the source of
+truth; the browser does not simulate a directory change in React.
+
 ## Process Boundaries
 
 ```text
@@ -420,6 +430,8 @@ AI provider
 Rules:
 
 - React cannot spawn arbitrary processes directly.
+- React cannot enumerate arbitrary filesystem paths; Workspace Explorer reads
+  only canonical directories contained by the selected workspace root.
 - Python cannot send commands directly to a terminal.
 - The AI sidecar cannot bypass Rust validation or approval.
 - Provider credentials never enter the command transcript.

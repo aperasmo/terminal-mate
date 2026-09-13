@@ -1,11 +1,30 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use serde::Serialize;
 use tauri::AppHandle;
 use tauri_plugin_dialog::{DialogExt, FilePath};
 use uuid::Uuid;
 
 use crate::models::workspace::{ExecutionProfile, Workspace};
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkspaceDirectoryEntry {
+    name: String,
+    path: String,
+    kind: String,
+    hidden: bool,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkspaceDirectoryListing {
+    current_directory: String,
+    relative_path: String,
+    parent_directory: Option<String>,
+    entries: Vec<WorkspaceDirectoryEntry>,
+}
 
 #[tauri::command]
 pub fn pick_workspace(app: AppHandle) -> Result<Option<Workspace>, String> {
@@ -40,6 +59,92 @@ pub fn configure_workspace_runtime(
 ) -> Result<Workspace, String> {
     workspace.profile = execution_profile_for_runtime(&workspace.path, &runtime)?;
     Ok(workspace)
+}
+
+#[tauri::command]
+pub fn list_workspace_directory(
+    workspace: Workspace,
+    directory: String,
+) -> Result<WorkspaceDirectoryListing, String> {
+    let root = PathBuf::from(&workspace.path)
+        .canonicalize()
+        .map_err(|error| format!("Could not open the workspace root: {error}"))?;
+    let requested = runtime_path_to_host(&workspace, &directory)?;
+    let current = requested
+        .canonicalize()
+        .map_err(|error| format!("Could not open that folder: {error}"))?;
+
+    if !current.starts_with(&root) {
+        return Err("Folder browsing is limited to the selected workspace.".to_owned());
+    }
+    if !current.is_dir() {
+        return Err("The selected path is not a folder.".to_owned());
+    }
+
+    let mut entries = std::fs::read_dir(&current)
+        .map_err(|error| format!("Could not read that folder: {error}"))?
+        .filter_map(Result::ok)
+        .filter_map(|entry| {
+            let file_type = entry.file_type().ok()?;
+            let kind = if file_type.is_dir() {
+                "directory"
+            } else if file_type.is_file() {
+                "file"
+            } else {
+                return None;
+            };
+            let name = entry.file_name().to_string_lossy().into_owned();
+            Some(WorkspaceDirectoryEntry {
+                path: host_path_to_runtime(&workspace, &entry.path()),
+                hidden: name.starts_with('.'),
+                name,
+                kind: kind.to_owned(),
+            })
+        })
+        .collect::<Vec<_>>();
+
+    entries.sort_by(|left, right| {
+        let left_directory = left.kind == "directory";
+        let right_directory = right.kind == "directory";
+        right_directory
+            .cmp(&left_directory)
+            .then_with(|| left.name.to_lowercase().cmp(&right.name.to_lowercase()))
+    });
+
+    let relative = current.strip_prefix(&root).unwrap_or(Path::new(""));
+    let parent_directory = (current != root)
+        .then(|| current.parent())
+        .flatten()
+        .map(|parent| host_path_to_runtime(&workspace, parent));
+
+    Ok(WorkspaceDirectoryListing {
+        current_directory: host_path_to_runtime(&workspace, &current),
+        relative_path: if relative.as_os_str().is_empty() {
+            ".".to_owned()
+        } else {
+            relative.to_string_lossy().replace('\\', "/")
+        },
+        parent_directory,
+        entries,
+    })
+}
+
+fn runtime_path_to_host(workspace: &Workspace, directory: &str) -> Result<PathBuf, String> {
+    if workspace.profile.runtime == "wsl" {
+        return wsl_path_to_windows(directory).ok_or_else(|| {
+            "That WSL folder cannot be mapped to the selected Windows workspace.".to_owned()
+        });
+    }
+    Ok(PathBuf::from(directory))
+}
+
+fn host_path_to_runtime(workspace: &Workspace, path: &Path) -> String {
+    if workspace.profile.runtime == "wsl" {
+        return windows_path_to_wsl(path).unwrap_or_else(|| path.to_string_lossy().into_owned());
+    }
+
+    let value = path.to_string_lossy();
+    value.strip_prefix(r"\\?\").unwrap_or(&value).to_owned()
 }
 
 fn workspace_name(path: &Path) -> Result<String, String> {
@@ -185,9 +290,10 @@ pub(crate) fn wsl_path_to_windows(path: &str) -> Option<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::{
-        default_execution_profile, execution_profile_for_runtime, windows_path_to_wsl,
-        wsl_path_to_windows,
+        default_execution_profile, execution_profile_for_runtime, list_workspace_directory,
+        windows_path_to_wsl, wsl_path_to_windows,
     };
+    use crate::models::workspace::Workspace;
     use std::path::PathBuf;
 
     #[test]
@@ -237,6 +343,61 @@ mod tests {
     #[test]
     fn leaves_non_wsl_paths_unmapped() {
         assert_eq!(wsl_path_to_windows(r"D:\APE\terminal-mate"), None);
+    }
+
+    #[test]
+    fn lists_workspace_entries_with_directories_first() {
+        let root = std::env::temp_dir().join(format!("terminal-mate-browser-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(root.join("z-folder")).expect("create test folder");
+        std::fs::create_dir_all(root.join("a-folder")).expect("create test folder");
+        std::fs::write(root.join("notes.txt"), "test").expect("create test file");
+        let workspace = Workspace {
+            id: "test".to_owned(),
+            name: "test".to_owned(),
+            path: root.to_string_lossy().into_owned(),
+            profile: default_execution_profile(&root),
+        };
+
+        let listing = list_workspace_directory(
+            workspace,
+            root.to_string_lossy().into_owned(),
+        )
+        .expect("list workspace root");
+
+        assert_eq!(listing.relative_path, ".");
+        assert!(listing.parent_directory.is_none());
+        assert_eq!(
+            listing.entries.iter().map(|entry| entry.name.as_str()).collect::<Vec<_>>(),
+            vec!["a-folder", "z-folder", "notes.txt"]
+        );
+        assert_eq!(listing.entries[0].kind, "directory");
+        assert_eq!(listing.entries[2].kind, "file");
+
+        std::fs::remove_dir_all(root).expect("remove test workspace");
+    }
+
+    #[test]
+    fn refuses_to_list_a_directory_outside_the_workspace() {
+        let base = std::env::temp_dir().join(format!("terminal-mate-boundary-{}", uuid::Uuid::new_v4()));
+        let root = base.join("workspace");
+        let outside = base.join("outside");
+        std::fs::create_dir_all(&root).expect("create workspace");
+        std::fs::create_dir_all(&outside).expect("create outside folder");
+        let workspace = Workspace {
+            id: "test".to_owned(),
+            name: "test".to_owned(),
+            path: root.to_string_lossy().into_owned(),
+            profile: default_execution_profile(&root),
+        };
+
+        let error = list_workspace_directory(
+            workspace,
+            outside.to_string_lossy().into_owned(),
+        )
+        .expect_err("outside folder should be rejected");
+
+        assert!(error.contains("limited to the selected workspace"));
+        std::fs::remove_dir_all(base).expect("remove test folders");
     }
 
     #[cfg(target_os = "windows")]

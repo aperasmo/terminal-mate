@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import date
+from datetime import date, timedelta
 
 from app.intent.command_catalog import COMMAND_CATALOG
 from app.schemas.intents import CommandIntent, IntentResponse
@@ -10,7 +10,15 @@ _PLACEHOLDER = re.compile(r"<([a-zA-Z0-9][a-zA-Z0-9/-]*)>")
 _LEADING_QUERY_VERB = re.compile(
     r"^(?:check|view|get|display|inspect)\s+", re.IGNORECASE
 )
+_POLITE_PREFIX = re.compile(
+    r"^(?:(?:can|could|would|will)\s+you\s+|please\s+)", re.IGNORECASE
+)
 _EXTRA_ALIASES = {
+    "aws_show_current_aws_identity": [
+        "show my AWS identity",
+        "my AWS identity",
+        "AWS identity",
+    ],
     "aws_show_lambda_concurrent_executions_quota": ["show lambda quota", "check lambda quota"],
     "github_list_workflow_runs": [
         "list github workflows",
@@ -43,6 +51,7 @@ def _parameter_name(value: str) -> str:
 def _normalize(value: str) -> str:
     value = value.strip().rstrip(".!?")
     value = re.sub(r"\s+", " ", value)
+    value = _POLITE_PREFIX.sub("", value)
     return _LEADING_QUERY_VERB.sub("show ", value)
 
 
@@ -67,8 +76,10 @@ def _render(entry: dict[str, object], values: dict[str, str]) -> str:
         command,
     )
     today = date.today()
+    next_month = (today.replace(day=28) + timedelta(days=4)).replace(day=1)
     command = command.replace("<YYYY-MM-01>", today.replace(day=1).isoformat())
     command = command.replace("<YYYY-MM-DD>", today.isoformat())
+    command = command.replace("<NEXT-MONTH-01>", next_month.isoformat())
     return command
 
 
